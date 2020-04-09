@@ -80,16 +80,7 @@ const App = () => {
 				
 			})
 			.catch(e=>console.log(e))
-		// fetch(`./data/states.json`, {cache: 'no-cache'})
-		// 	.then(res=>{
-		// 		if (res.ok) {
-		// 			return res.json()
-		// 		}
-		// 	})
-		// 	.then(json=>{
-		// 		setChartData(json)
-		// 	})
-		// 	.catch(e=>console.log(e))
+
 		fetch(`./data/counties.json`, {cache: 'no-cache'})
 			.then(res=>{
 				if (res.ok) {
