@@ -59,7 +59,7 @@ const ChartWidget = (props) => {
     const [zoomDomain, setZoomDomain] = useState(null);
     const [indexList, setIndexList] = useState([0]);
     const [error, setError] = useState(false);
-    const [domain, setDomain] = useState({x: [1, props.data[0].dayCount.length], y: [0,2088]});
+    const [domain, setDomain] = useState({x: [1, props.data[0].series.length], y: [0,2088]});
     const [dataset, toggleDataset] = useState("confirmed")
 
     const classes = styles();
@@ -75,14 +75,14 @@ const ChartWidget = (props) => {
     const resetDomain = (list, data=dataset) => {
       console.log("reset domain", dataset)
       let highlist = list.map(el=>{
-        return Math.max.apply(Math, props.data[el].dayCount.map(function(o) { return o[data]; }))
+        return Math.max.apply(Math, props.data[el].series.map(function(o) { return o[data]; }))
       })
 
       let highcount = Math.max.apply(null, highlist)
 
       console.log(highlist, highcount)
 
-      setDomain({x: [1, props.data[0].dayCount.length], y: [0,highcount]})
+      setDomain({x: [1, props.data[0].series.length], y: [0,highcount]})
     }
 
     const handleChange = (e) => {
@@ -142,7 +142,7 @@ const ChartWidget = (props) => {
 									labelPlacement="end"
 								/>
 							</RadioGroup>
-              <FormControl error={error} id="search-bar" className={classes.comboBox}>
+              {/* <FormControl error={error} id="search-bar" className={classes.comboBox}>
                 <FormLabel id="demo-simple-select-outlined-label">Select Up to 5 Countries</FormLabel>
                     <FormGroup
                     id="demo-simple-select-outlined"
@@ -159,7 +159,7 @@ const ChartWidget = (props) => {
                       )
                       }
                     </FormGroup>
-                  </FormControl>
+                  </FormControl> */}
             </div>
             <div className={classes.chart}>
               <div className={classes.legend} style={{ 
@@ -180,8 +180,8 @@ const ChartWidget = (props) => {
                 style={{flex: 7, height: '100%'}}
                     containerComponent={
                     <VictoryZoomVoronoiContainer
-                      zoomDimension="x"
-                      // voronoiPadding={20}
+                      // zoomDimension="x"
+                      // // voronoiPadding={20}
                       // voronoiDimension="x"
                       domain={domain}
                       zoomDomain={domain}
@@ -195,11 +195,13 @@ const ChartWidget = (props) => {
                         cornerRadius={0} 
                         flyoutStyle={{ width: 10, stroke: 'black', strokeWidth: '0.5'}}/>}
                         labels={({ datum }) => {
-                          return `${datum.childName}\nDate: ${datum.date}\nCases: ${datum.confirmed.toString().replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}\nDeaths: ${datum.deaths.toString().replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}\nRecovered: ${datum.recovered.toString().replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}`
+                          console.log(datum)
+                          return `${datum.childName}\nDate: ${datum.date}\nCases: ${datum.confirmed.toString().replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}\nDeaths: ${datum.deaths.toString().replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}`
                         }}
                       
                     />
-                }>
+                }
+                >
                   
                   <VictoryAxis
                     fixLabelOverlap
@@ -231,6 +233,7 @@ const ChartWidget = (props) => {
                     }}
                     />
                     {indexList.map((i, j)=>{
+                      console.log(props.data[i])
                       return <VictoryLine 
                       key={j}
                       // color="#cc5f00"
@@ -242,13 +245,13 @@ const ChartWidget = (props) => {
                         }
   
                       }}
-                      data={props.data[i].dayCount} 
+                      data={props.data[i].series} 
                       style={{
                         data: {
                           stroke: colors[j]
                         }
                       }}
-                      name={props.data[i].country}
+                      name={props.data[i].state}
                       x="date"
                       y={dataset}
   
@@ -258,7 +261,7 @@ const ChartWidget = (props) => {
 
 
 
-                    }
+                    } 
             </VictoryChart>
             </div>
         </div>

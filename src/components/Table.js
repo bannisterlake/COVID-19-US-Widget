@@ -58,25 +58,20 @@ const TableChart = (props) => {
 
     const handleChange = e => {
         setFilter(e.target.value);
-        setTotals
     }
-    const setTotals = ()=> {
-        if (props.data) {
+    const setTotals = (data)=> {
+        if (data) {
             let totalConfirmed = 0
             let totalDeaths = 0
             let totalRecovered = 0
 
-            props.data.customList.filter(arr=>{
-                if (arr.region) {
-                    if (arr.country.toLowerCase().indexOf(filter.toLowerCase()) != -1 ||arr.region.toLowerCase().indexOf(filter.toLowerCase()) != -1 ) {
-                        return true
-                    }
-                }
-            }).forEach(country=>{
-                totalConfirmed+= parseInt(country.confirmed);
-                totalDeaths+= parseInt(country.deaths);
-                totalRecovered+= parseInt(country.recovered);
+            data.customList
+            .forEach(state=>{
+                totalConfirmed+= parseInt(state.confirmed);
+                totalDeaths+= parseInt(state.deaths);
+                totalRecovered+= parseInt(state.recovered);
             })
+        
         
             return (
                 <TableRow >
@@ -94,10 +89,10 @@ const TableChart = (props) => {
   
     return (
         <div className={classes.root}>
-            <TableContainer className={classes.table}>
+            {props.data && <TableContainer className={classes.table}>
 
-                <div className={classes.searchBar} style={{flexDirection: small ? 'column': 'row'}}>
-    			{/* <h1>COVID-19 Cases by Country/Region</h1> */}
+                {/* <div className={classes.searchBar} style={{flexDirection: small ? 'column': 'row'}}>
+    			
 
                 <FormControl id="search-bar" >
                 <InputLabel id="demo-simple-select-outlined-label">Select Region</InputLabel>
@@ -109,41 +104,37 @@ const TableChart = (props) => {
                     label="Region"
                     >
                         <MenuItem value="">
-                            <em>World</em>
+                            <em>USA</em>
                         </MenuItem>
-                        <MenuItem value={"Asia"}>Asia</MenuItem>
-                        <MenuItem value={"Caribbean"}>Caribbean</MenuItem>
-                        <MenuItem value={"Central America"}>Central America</MenuItem>
-                        <MenuItem value={"Europe"}>Europe</MenuItem>
-                        <MenuItem value={"Middle East"}>Middle East</MenuItem>
-                        <MenuItem value={"North America"}>North America</MenuItem>
-                        <MenuItem value={"Oceania"}>Oceania</MenuItem>
-                        <MenuItem value={"South America"}>South America</MenuItem>
+                        {props.data.customList .sort((a,b)=>{
+                            if (a.state > b.state) {
+                                return 1;
+                            } else if (a.state < b.state) {
+                                return -1;
+                            } else
+                                return 0;
+                        })  
+                        .map(state=>{
+                            return <MenuItem value={state.state}>{state.state}</MenuItem>
 
-                    </Select>
-                    {/* <InputLabel htmlFor="search-bar">Search</InputLabel>
-                    <Input
-                        id="search-bar"
-                        value={filter}
-                        onChange={handleChange}
-                        endAdornment={
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
+                        })
+                            
                         }
-                    /> */}
+                        
+                    </Select>
+              
                     </FormControl>
-                </div>
+                </div> */}
             <Table stickyHeader>
                 <TableHead>
                     <TableRow role="checkbox">
                         <TableCell
 								// data-tip="Sort by team name"
-								onClick={() => changeSortBy("country")}
-								>Country
+								onClick={() => changeSortBy("state")}
+								>State
 								
 								<TableSortLabel
-									active={sortBy === "country" ? true : false}
+									active={sortBy === "state" ? true : false}
 									direction={sortDirection === 1 ? "asc" : "desc"}
 								/>
                         </TableCell>
@@ -170,9 +161,9 @@ const TableChart = (props) => {
                         </TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody className={classes.body}>
+                {!filter ? <TableBody className={classes.body}>
                     {
-                        setTotals()
+                        setTotals(props.data)
                     }
                     {props.data && 
                     props.data.customList
@@ -193,27 +184,71 @@ const TableChart = (props) => {
                                 return 0;
                         }
                     })  
-                    .filter(arr=>{
-                        if (arr.region) {
-                            if (arr.country.toLowerCase().indexOf(filter.toLowerCase()) != -1 ||arr.region.toLowerCase().indexOf(filter.toLowerCase()) != -1 ) {
-                                return true
-                            }
-                        }
+                    // .filter(arr=>{
+                    //     if (arr.region) {
+                    //         if (arr.state.toLowerCase().indexOf(filter.toLowerCase()) != -1 ||arr.region.toLowerCase().indexOf(filter.toLowerCase()) != -1 ) {
+                    //             return true
+                    //         }
+                    //     }
                         
-                    })
-                    .map(country=>{
-                        return <TableRow key={country.id}>
-                            <TableCell>{country.country}</TableCell>
-                            <TableCell align="right">{country.confirmed.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
-                            <TableCell align="right" >{country.deaths.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
-                            <TableCell align="right">{country.recovered.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
+                    // })
+                    .map(state=>{
+                        console.log(state)
+                        return <TableRow key={state.id}>
+                            <TableCell>{state.state}</TableCell>
+                            <TableCell align="right">{state.confirmed.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
+                            <TableCell align="right" >{state.deaths.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
+                            <TableCell align="right">{state.recovered.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
 
                         </TableRow>
                     })
                     }
-                </TableBody>
+                </TableBody> : 
+                <TableBody className={classes.body}>
+                    {
+                        setTotals(props.countyData)
+                    }
+                    {props.data && 
+                    props.data.customList
+                    .sort((a,b)=>{
+                        if (isNaN(parseInt(a[sortBy]))) {
+                            if (a[sortBy] > b[sortBy]) {
+                                return 1 * sortDirection;
+                            } else if (a[sortBy] < b[sortBy]) {
+                                return -1 * sortDirection;
+                            } else
+                                return 0;
+                        } else {
+                            if (parseInt(a[sortBy]) > parseInt(b[sortBy])) {
+                                return -1 * sortDirection;
+                            } else if (parseInt(a[sortBy]) < parseInt(b[sortBy])) {
+                                return 1 * sortDirection;
+                            } else
+                                return 0;
+                        }
+                    })  
+                    // .filter(arr=>{
+                    //     if (arr.region) {
+                    //         if (arr.state.toLowerCase().indexOf(filter.toLowerCase()) != -1 ||arr.region.toLowerCase().indexOf(filter.toLowerCase()) != -1 ) {
+                    //             return true
+                    //         }
+                    //     }
+                        
+                    // })
+                    .map(state=>{
+                        console.log(state)
+                        return <TableRow key={state.id}>
+                            <TableCell>{state.state}</TableCell>
+                            <TableCell align="right">{state.confirmed.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
+                            <TableCell align="right" >{state.deaths.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
+                            <TableCell align="right">{state.recovered.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</TableCell>
+
+                        </TableRow>
+                    })
+                    }
+                </TableBody>}
             </Table>
-            </TableContainer>
+            </TableContainer>}
         </div>
     );
 }

@@ -59,9 +59,9 @@ const Tooltip =(props) => {
 
 
     return <div className={small ? classes.tooltipSm : classes.tooltip}>
-        {props.countryData ?
+        {(props.data && props.data.confirmed > 0)?
             <div>
-                <div className={small ? classes.titleSm : classes.title}>{props.countryData.country}</div>
+                <div className={small ? classes.titleSm : classes.title}>{props.name}</div>
                     {/* <div className={classes.dataDiv}>
                         <div className={classes.label}>
                             <div>Confirmed Cases:</div>
@@ -69,9 +69,9 @@ const Tooltip =(props) => {
                             <div>Recovered:</div>
                         </div>
                         <div className={classes.data}>
-                            <div>{props.countryData.confirmed}</div>
-                            <div>{props.countryData.deaths}</div>
-                            <div>{props.countryData.recovered}</div>
+                            <div>{props.data.confirmed}</div>
+                            <div>{props.data.deaths}</div>
+                            <div>{props.data.recovered}</div>
 
                         </div>
 
@@ -80,20 +80,20 @@ const Tooltip =(props) => {
 
                 <div className={small ? classes.dataDivSm : classes.dataDiv}>
                     <div className={classes.label}>Confirmed: </div>
-                    <div className={classes.data}>{props.countryData.confirmed.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</div>
+                    <div className={classes.data}>{parseInt(props.data.confirmed).toLocaleString('en') }</div>
                 </div>
                 <div className={small ? classes.dataDivSm : classes.dataDiv}>
                     <div className={classes.label}>Deaths: </div>
-                    <div className={classes.data}>{props.countryData.deaths.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</div>
+                    <div className={classes.data}>{props.data.deaths.toLocaleString('en') }</div>
                 </div>
-                <div className={small ? classes.dataDivSm : classes.dataDiv}>
+                {/* <div className={small ? classes.dataDivSm : classes.dataDiv}>
                     <div className={classes.label}>Recovered: </div>
-                    <div className={classes.data}>{props.countryData.recovered.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</div>
-                </div>
+                    <div className={classes.data}>{props.data.recovered.replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,")}</div>
+                </div> */}
             </div>
             :
             <div>
-                <div className={classes.title}>{props.country}</div>
+                <div className={classes.title}>{props.name}</div>
                     No Cases Reported
             </div>
         }

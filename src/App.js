@@ -4,7 +4,9 @@ import {makeStyles} from '@material-ui/core/styles';
 import {Button} from '@material-ui/core'
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import ReactTooltip from 'react-tooltip'
-import axios from 'axios'
+
+import packageJson from '../package.json';
+global.appVersion = packageJson.version;
 
 //Components
 import Map from './components/Map';
@@ -41,17 +43,22 @@ const styles = makeStyles({
 	},
 	selected: {
 		border: '1px solid white !important'
+	},
+	widgetDiv: {
+		position: 'relative',
+		overflow: 'hidden'
 	}
 })
 
 const App = () => {
 
 	const [data, setData] = useState(null)
-	const [chartData, setChartData] = useState(null)
+	// const [chartData, setChartData] = useState(null)
+	const [countyData, setCountyData] = useState(null)
 
 	const [counter, setCounter] = useState(360)
 
-	const [widget, toggleWidget] = useState("chart")
+	const [widget, toggleWidget] = useState("map")
 
 	const classes = styles();
 
@@ -62,7 +69,7 @@ const App = () => {
 
 	const getData = () => {
 		console.log("fetching..")
-		fetch(`./data/data.json`,{ cache: "no-cache"})
+		fetch(`./data/statedata.json`,{ cache: "no-cache"})
 			.then(res => {
 				if (res.ok) {
 					return res.json();
@@ -73,14 +80,24 @@ const App = () => {
 				
 			})
 			.catch(e=>console.log(e))
-		fetch(`./data/countries.json`, {cache: 'no-cache'})
+		// fetch(`./data/states.json`, {cache: 'no-cache'})
+		// 	.then(res=>{
+		// 		if (res.ok) {
+		// 			return res.json()
+		// 		}
+		// 	})
+		// 	.then(json=>{
+		// 		setChartData(json)
+		// 	})
+		// 	.catch(e=>console.log(e))
+		fetch(`./data/counties.json`, {cache: 'no-cache'})
 			.then(res=>{
 				if (res.ok) {
 					return res.json()
 				}
 			})
 			.then(json=>{
-				setChartData(json)
+				setCountyData(json)
 			})
 			.catch(e=>console.log(e))
 	}
@@ -107,15 +124,17 @@ const App = () => {
 
 	return (
 		<div className={classes.main}>
-			<div className={classes.title} style={{fontSize: small && '20px'}} >COVID-19 Pandemic Data
-				<div className={classes.widgetNav}>
+			<div className={classes.title} style={{fontSize: small && '20px'}} >USA COVID-19 Pandemic Data
+				{/* <div className={classes.widgetNav}>
 					<Button className={widget === "map" && classes.selected} onClick={()=>toggleWidget("map")}>Map</Button>
 					<Button className={widget === "table" && classes.selected} onClick={()=>toggleWidget("table")}>Table</Button>
 					<Button className={widget === "chart" && classes.selected} onClick={()=>toggleWidget("chart")}>Chart</Button>
 
-				</div>
+				</div> */}
 			</div>
+			<div className={classes.widgetDiv}>
 			{widget === 'map' && <TransformWrapper 
+				style={{position: 'relative'}}
 				wheel={{
 					step: 80
 				}}
@@ -126,18 +145,18 @@ const App = () => {
 				onPanning={closeTooltip}
 				onPinching={closeTooltip}
 				>
-					
-				<Map data={data}/>
-				{/* {data && <p>{data.generated}</p>} */}
+				{({zoomIn, zoomOut, setDefaultState, resetTransform})=>(
+					<Map reset={setDefaultState} data={data} countyData={countyData}/>
+				)}
 			</TransformWrapper>}
-			{ widget === "table" &&
-				<TableChart data={data} />
-			}
-			{ (widget === "chart" && chartData) &&
+			{/* { widget === "table" &&
+				<TableChart data={data} countyData={countyData}/>
+			} */}
+			{/* { (widget === "chart" && chartData) &&
 				<Chart small={small} data={chartData}/>
 
-			}
-
+			} */}
+			</div>
 		</div>
 	);
 }
